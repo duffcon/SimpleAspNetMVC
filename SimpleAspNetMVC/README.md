@@ -1,82 +1,133 @@
-﻿Html has buttons.
+﻿
+Just using in memory data, will use a database instead using the EntityFramework.
+
 ```
- <input type="button" value="Click"/>
-```
-And perform an Action in a controller.
-```
-onclick="location.href='@Url.Action("SomeAction", "SomeController", new {param1 = x, param2 = x, ...)'"
+Tools > NuGet Package Manager > Package Manager Console
+cd SimpleAspNetMVC
+dotnet add package Microsoft.EntityFrameworkCore.Sqlite
 ```
 
-
-Make a new action to check the books in and out. 
+Create LibraryContext
 ```
-//HomeControllers.cs
-public IActionResult CheckBook(int id, bool newvalue)
+//LibraryContext.cs
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace SimpleAspNetMVC.Data.Models
 {
-    mybooks[id].Out = newvalue;
-    return View(mybooks[id]);
-}
-```
-
-Create View for the action.
-
-```
-//CheckBook.cshtml
-@using SimpleAspNetMVC.Data.Models;
-@model Book
-
-<h2>Library</h2>
-
-@{
-    if (Model.Out == false)
+    public class LibraryContext : DbContext
     {
-        <h2> You Checked In @Model.Title - @Model.Author</h2>
-    }
-    else
-    {
-        <h2> You Checked Out @Model.Title - @Model.Author</h2>
+        public LibraryContext(DbContextOptions<LibraryContext> options) : base(options)
+        {
+        }
+        public DbSet<Book> BookSet { get; set; }
+
     }
 }
-
- <input type="button" value="Go Back" onclick="location.href='@Url.Action("Index", "Home")'" />
 ```
 
-Add buttons linking to that new action. Added some styling as well.
+
+You connect to the database with a connection string like this.
 ```
-//Index.cshtml
-@using SimpleAspNetMVC.Data.Models;
-@model List<Book>
+"Server=(localdb)\\MSSQLLocalDB;Database=_CHANGE_ME_;Trusted_Connection=True;MultipleActiveResultSets=true"
+```
+
+I will call the database: LibraryDB.
+```
+"Server=(localdb)\\MSSQLLocalDB;Database=LibraryDB;Trusted_Connection=True;MultipleActiveResultSets=true"
+```
+
+"Put" the context into our services
+```
+//Startup.cs
+    var connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=LibraryDB;Trusted_Connection=True;MultipleActiveResultSets=true";
+    services.AddDbContext<LibraryContext>
+        (options => options.UseSqlServer(connectionString));
+```
+
+Add using statements
+```
+//Startup.cs
+using Microsoft.EntityFrameworkCore;
+using SimpleAspNetMVC.Data.Models;
+```
 
 
-<h2>Library</h2>
+Package Manager Console
+```
+update-database
+```
 
-@foreach (var b in Model)
+Created database, but empty
+```
+View > SQL Server Object Explorer
+[Refresh]
+SQL Server > (localdb)\MSSQLocalDB.... > Databases > LibraryDB
+```
+
+
+Need to populate or initialize the database. Create DBInit.cs. Call the Seed function to populate the database with books.
+
+```
+//DBInit.cs
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace SimpleAspNetMVC.Data.Models
 {
-    if (b.Out == true)
+    public class DBInit
     {
-        <p style="color:Red">@b.Title - @b.Author  <input type="button" value="Check In" onclick="location.href='@Url.Action("CheckBook", "Home", new {id = b.ID, newvalue = !b.Out})'" /> </p>
+        public static void Seed(IApplicationBuilder applicationBuilder)
+        {
+            LibraryContext context = applicationBuilder.ApplicationServices.GetRequiredService<LibraryContext>();
+
+            //If The database has no books
+            if (!context.BookSet.Any())
+            {
+                context.AddRange
+                (
+                    new Book { Title = "The Great Gatsby", Author = "F. Scott Fitzgerald", Out = true },
+                    new Book { Title = "The Adventures of Tom Sawyer", Author = "Mark Twain", Out = false },
+                    new Book { Title = "Adventures of Huckleberry Finn", Author = "Mark Twain", Out = false },
+                    new Book { Title = "This Side of Paradise", Author = "F Scott Fitzgerald", Out = true }
+                );
+            }
+
+            context.SaveChanges();
+
+        }
     }
-    else
-    {
-        <p style="color:Green">@b.Title - @b.Author <input type="button" value="Check Out" onclick="location.href='@Url.Action("CheckBook", "Home", new {id = b.ID, newvalue = !b.Out})'" /> </p>
-    }
-    
 }
-
 ```
 
-
-
-
-
-
-
-mybooks needs to be static so changes are saved.
 ```
-public static List<Book> mybooks
+//Startup.cs
+DBInit.Seed(app);
 ```
 
+You will get thrown and error add this code to Program.cs
 
-
+Old
 ```
+//Program.cs
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+            WebHost.CreateDefaultBuilder(args)
+                .UseStartup<Startup>();
+```
+
+New
+```
+//Program.cs
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+            WebHost.CreateDefaultBuilder(args)
+                .UseStartup<Startup>()
+                .UseDefaultServiceProvider(options =>
+                        options.ValidateScopes = false);
 ```
