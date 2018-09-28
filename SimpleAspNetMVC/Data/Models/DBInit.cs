@@ -21,7 +21,7 @@ namespace SimpleAspNetMVC.Data.Models
                     new Book { Title = "The Great Gatsby", Author = "F. Scott Fitzgerald", Out = true },
                     new Book { Title = "The Adventures of Tom Sawyer", Author = "Mark Twain", Out = false },
                     new Book { Title = "Adventures of Huckleberry Finn", Author = "Mark Twain", Out = false },
-                    new Book { Title = "This Side of Paradise", Author = "F Scott Fitzgerald", Out = true }
+                    new Book { Title = "This Side of Paradise", Author = "F. Scott Fitzgerald", Out = true }
                 );
             }
 

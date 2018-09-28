@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using SimpleAspNetMVC.Data.interfaces;
 using SimpleAspNetMVC.Data.Models;
 
 
@@ -21,6 +22,7 @@ namespace SimpleAspNetMVC
             var connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=LibraryDB;Trusted_Connection=True;MultipleActiveResultSets=true";
             services.AddDbContext<LibraryContext>
                 (options => options.UseSqlServer(connectionString));
+            services.AddTransient<ILibraryIntern, LibraryIntern>();
             services.AddMvc();
         }
 

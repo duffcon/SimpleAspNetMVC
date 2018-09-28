@@ -3,35 +3,36 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using SimpleAspNetMVC.Data.interfaces;
 using SimpleAspNetMVC.Data.Models;
 
 namespace SimpleAspNetMVC.Controllers
 {
     public class HomeController : Controller
     {
-        public LibraryContext mycontext;
+        public ILibraryIntern myintern;
 
-        public HomeController(LibraryContext context)
+        public HomeController(ILibraryIntern intern)
         {
-            mycontext = context;
+            myintern = intern;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(int sort = 1)
         {
-            IEnumerable<Book> mybooks = (from b in mycontext.BookSet
-                                         orderby b.Title
-                                         select b).AsEnumerable();
-            return View(mybooks.ToList());
+            switch (sort)
+            {
+                case 2:
+                    return View(myintern.OrderByOut.ToList());
+
+                default:
+                    return View(myintern.OrderByTitle.ToList());
+
+            }
         }
 
         public IActionResult CheckBook(int id, bool newvalue)
         {
-            Book mybooks = (from b in mycontext.BookSet
-                           where b.ID == id
-                           select b).FirstOrDefault();
-            mybooks.Out = newvalue;
-            mycontext.SaveChanges();
-            return View(mybooks);
+            return View(myintern.SetOut(id, newvalue));
         }
     }
 }

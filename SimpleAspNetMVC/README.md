@@ -1,94 +1,151 @@
 ﻿
+The Good: passing interface. 
 
-The Good, The Bad, and the Ugly.
+The HomeController has a lot on its plate: dealing with actions AND books. Instead we will outsource the book stuff to an intern.
 
-The Ugly: Directly instantiate data.
+Create Data/inerfaces.
+
+Create interface ILibraryIntern.cs (Job posting of responsibilities).
 ```
-//HomeController.cs
-public static List<Book> mybooks { get; set; } = new List<Book>{...}
-```
+//ILibraryIntern.cs
+using SimpleAspNetMVC.Data.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-
-The Bad (But better): Passing the context as a parameter.
-```
-//HomeController.cs
-public LibraryContext mycontext;
-
-public HomeController(LibraryContext _libraryContext)
+namespace SimpleAspNetMVC.Data.interfaces
 {
-    mycontext = _libraryContext;
-}
-```
-
-
-
-
-Will interact with DBSet<Book> instead of a List<Book> using LINQ.
-
-Modify the Index action.
-```
-//HomeController.cs
-public IActionResult Index()
-{
-    IEnumerable<Book> mybooks = (from b in mycontext.BookSet
-                    orderby b.Title
-                    select b).AsEnumerable();
-    return View(mybooks.ToList());
+    public interface ILibraryIntern
+    {
+        IEnumerable<Book> OrderByTitle { get; }
+        IEnumerable<Book> OrderByOut { get; }
+        Book SetOut(int id, bool val);
+    }
 }
 
 ```
 
 
 
+LibraryIntern has passed the interview they need to train for the job (inplement interface). Create LibraryIntern.cs
+```
+//LibraryIntern.cs
+using SimpleAspNetMVC.Data.interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace SimpleAspNetMVC.Data.Models
+{
+    public class LibraryIntern : ILibraryIntern
+    {
+
+        private readonly LibraryContext libraryContext;
+
+        public LibraryIntern(LibraryContext _libraryContext)
+        {
+            _libraryContext = libraryContext;
+        }
 
 
-And the CheckBook action.
+        public IEnumerable<Book> OrderByTitle
+        {
+            get
+            {
+                var query = (from b in libraryContext.BookSet
+                             orderby b.Title
+                             select b
+                ).AsEnumerable();
+                return query;
+            }
+
+        }
+
+        public IEnumerable<Book> OrderByOut
+        {
+            get
+            {
+                var query = (from b in libraryContext.BookSet
+                             orderby b.Out
+                             select b
+                            ).AsEnumerable();
+                return query;
+            }
+
+        }
+
+
+        public Book SetOut(int id, bool val)
+        {
+            var query = (from b in libraryContext.BookSet
+                         where b.ID == id
+                         select b).FirstOrDefault();
+            query.Out = val;
+            libraryContext.SaveChanges();
+            return query;
+
+
+        }
+
+
+    }
+}
+
+```
+
+
+
+Need to inject the intern.
+```
+//Startup.cs
+using SimpleAspNetMVC.Data.interfaces;
+
+services.AddTransient<ILibraryIntern, LibraryIntern>();
+```
+
+
 ```
 //HomeController.cs
-public IActionResult CheckBook(int id, bool newvalue)
+using SimpleAspNetMVC.Data.interfaces;
+
+public ILibraryIntern myintern;
+
+public HomeController(ILibraryIntern intern)
 {
-    Book mybooks = (from b in mycontext.BookSet
-                    where b.ID == id
-                    select b).FirstOrDefault();
-    mybooks.Out = newvalue;
-    mycontext.SaveChanges();
-    return View(mybooks);
+    myintern = intern;
 }
+
 ```
 
 
-Optional: Using some more advanced LINQ add sorting feature
+Add sorting button
+```
+//Index.cshtml
+<input type="button" value="SortTitle" onclick="location.href='@Url.Action("Index", "Home", new {sort =  1})'" />
+<input type="button" value="SortOut" onclick="location.href='@Url.Action("Index", "Home", new {sort =  2})'" />
+```
+
+Modify actions to use the intern
 ```
 //HomeController.cs
 public IActionResult Index(int sort = 1)
 {
-    IEnumerable<Book> mybooks = null;
     switch (sort)
     {
-        case 1:
-            mybooks = (from b in mycontext.BookSet
-                            orderby b.Title
-                            select b).AsEnumerable();
-            break;
         case 2:
-            mybooks = (from b in mycontext.BookSet
-                            orderby b.Out
-                            select b).AsEnumerable();
-            break;
-               
+            return View(myintern.OrderByOut.ToList());
+
+        default:
+            return View(myintern.OrderByTitle.ToList());
+
     }
-    return View(mybooks.ToList());
 }
 
-```
-
-
-
-
-```
-//Index.cshtml
-<br /> 
-<input type="button" value="SortTitle" onclick="location.href='@Url.Action("Index", "Home", new {sort =  1})'" />
-<input type="button" value="SortOut" onclick="location.href='@Url.Action("Index", "Home", new {sort =  2})'" />
+public IActionResult CheckBook(int id, bool newvalue)
+{
+    return View(myintern.SetOut(id, newvalue));
+}
 ```
 
