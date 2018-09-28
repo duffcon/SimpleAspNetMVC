@@ -1,15 +1,24 @@
-﻿
+﻿Before you can access the database you need to learn about dependency injection.
 
-The Good, The Bad, and the Ugly.
+The Good, the Bad, and the Ugly.
 
-The Ugly: Directly instantiate data.
+The Ugly: A pizza place that only serves EXTRA pepperoni.
+![File](file.png)
+
+The Bad: A pizza place that only serves pepperoni, but you can specify the amount.
+![File2](file2.png)
+
+The Good: A pizza place that allows you to choose your toppings (a normal pizza place).
+![File3](file3.png)
+
+Our app is ugly as it directly instantiates data.
 ```
 //HomeController.cs
 public static List<Book> mybooks { get; set; } = new List<Book>{...}
 ```
 
 
-The Bad (But better): Passing the context as a parameter.
+Upgrade to bad: passing the context as a parameter.
 ```
 //HomeController.cs
 public LibraryContext mycontext;
@@ -23,9 +32,9 @@ public HomeController(LibraryContext _libraryContext)
 
 
 
-Will interact with DBSet<Book> instead of a List<Book> using LINQ.
+The controller will now interact with a context object instead of a list object. The syntax is LINQ which is similar to SQL. 
 
-Modify the Index action.
+Modify the Index and CheckBook action.
 ```
 //HomeController.cs
 public IActionResult Index()
@@ -36,15 +45,6 @@ public IActionResult Index()
     return View(mybooks.ToList());
 }
 
-```
-
-
-
-
-
-And the CheckBook action.
-```
-//HomeController.cs
 public IActionResult CheckBook(int id, bool newvalue)
 {
     Book mybooks = (from b in mycontext.BookSet
@@ -57,7 +57,7 @@ public IActionResult CheckBook(int id, bool newvalue)
 ```
 
 
-Optional: Using some more advanced LINQ add sorting feature
+Optional: Add sorting feature.
 ```
 //HomeController.cs
 public IActionResult Index(int sort = 1)
