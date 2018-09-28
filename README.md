@@ -2,7 +2,7 @@
 ```
  <input type="button" value="Click"/>
 ```
-And perform an Action in a controller.
+Buttons can link to an action in a controller.
 ```
 onclick="location.href='@Url.Action("SomeAction", "SomeController", new {param1 = x, param2 = x, ...)'"
 ```
@@ -66,17 +66,8 @@ Add buttons linking to that new action. Added some styling as well.
 ```
 
 
-
-
-
-
-
-mybooks needs to be static so changes are saved.
+mybooks needs to be static so changes are saved (not overwritten).
 ```
 public static List<Book> mybooks
 ```
 
-
-
-```
-```
