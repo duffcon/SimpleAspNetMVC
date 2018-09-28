@@ -1,0 +1,9 @@
+﻿@using SimpleAspNetMVC.Data.Models;
+@model List<Book>
+
+<h2 style="color:brown">Library</h2>
+
+@foreach (var b in Model)
+{
+    <p> @b.Title - @b.Author Out:@b.Out</p>
+}
