@@ -11,10 +11,10 @@ namespace SimpleAspNetMVC.Controllers
     {
         public List<Book> mybooks { get; set; } = new List<Book>
         {
-            new Book {Title= "The Great Gatsby", Author = "F. Scott Fitzgerald", Out = true},
-            new Book {Title = "The Adventures of Tom Sawyer", Author = "Mark Twain", Out = false},
-            new Book {Title = "Adventures of Huckleberry Finn", Author = "Mark Twain", Out = false},
-            new Book {Title= "This Side of Paradise", Author = "F. Scott Fitzgerald", Out = true}
+            new Book {ID = 0, Title= "The Great Gatsby", Author = "F. Scott Fitzgerald", Out = true},
+            new Book {ID = 1, Title = "The Adventures of Tom Sawyer", Author = "Mark Twain", Out = false},
+            new Book {ID = 2, Title = "Adventures of Huckleberry Finn", Author = "Mark Twain", Out = false},
+            new Book {ID = 3, Title= "This Side of Paradise", Author = "F. Scott Fitzgerald", Out = true}
         };
 
         public IActionResult Index()
