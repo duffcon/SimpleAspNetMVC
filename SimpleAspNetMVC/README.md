@@ -1,151 +1,69 @@
 ﻿
-The Good: passing interface. 
-
-The HomeController has a lot on its plate: dealing with actions AND books. Instead we will outsource the book stuff to an intern.
-
-Create Data/inerfaces.
-
-Create interface ILibraryIntern.cs (Job posting of responsibilities).
-```
-//ILibraryIntern.cs
-using SimpleAspNetMVC.Data.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace SimpleAspNetMVC.Data.interfaces
-{
-    public interface ILibraryIntern
-    {
-        IEnumerable<Book> OrderByTitle { get; }
-        IEnumerable<Book> OrderByOut { get; }
-        Book SetOut(int id, bool val);
-    }
-}
-
-```
-
-
-
-LibraryIntern has passed the interview they need to train for the job (inplement interface). Create LibraryIntern.cs
-```
-//LibraryIntern.cs
-using SimpleAspNetMVC.Data.interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace SimpleAspNetMVC.Data.Models
-{
-    public class LibraryIntern : ILibraryIntern
-    {
-
-        private readonly LibraryContext libraryContext;
-
-        public LibraryIntern(LibraryContext _libraryContext)
-        {
-            _libraryContext = libraryContext;
-        }
-
-
-        public IEnumerable<Book> OrderByTitle
-        {
-            get
-            {
-                var query = (from b in libraryContext.BookSet
-                             orderby b.Title
-                             select b
-                ).AsEnumerable();
-                return query;
-            }
-
-        }
-
-        public IEnumerable<Book> OrderByOut
-        {
-            get
-            {
-                var query = (from b in libraryContext.BookSet
-                             orderby b.Out
-                             select b
-                            ).AsEnumerable();
-                return query;
-            }
-
-        }
-
-
-        public Book SetOut(int id, bool val)
-        {
-            var query = (from b in libraryContext.BookSet
-                         where b.ID == id
-                         select b).FirstOrDefault();
-            query.Out = val;
-            libraryContext.SaveChanges();
-            return query;
-
-
-        }
-
-
-    }
-}
-
-```
-
-
-
-Need to inject the intern.
+It is bad practice to have the connection string variable. It is better to use appsettings which is more "hidden".
 ```
 //Startup.cs
-using SimpleAspNetMVC.Data.interfaces;
-
-services.AddTransient<ILibraryIntern, LibraryIntern>();
+var connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=LibraryDB;Trusted_Connection=True;MultipleActiveResultSets=true";
 ```
 
 
 ```
-//HomeController.cs
-using SimpleAspNetMVC.Data.interfaces;
+Add Item > [search appsettings] > App Settings File
+```
 
-public ILibraryIntern myintern;
-
-public HomeController(ILibraryIntern intern)
+```
+//appsettings.json
 {
-    myintern = intern;
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=(localdb)\\MSSQLLocalDB;Database=_CHANGE_ME;Trusted_Connection=True;MultipleActiveResultSets=true"
+  }
+}
+```
+
+Change the CHANGE_ME
+```
+//appsettings.json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=(localdb)\\MSSQLLocalDB;Database=LibraryDB;Trusted_Connection=True;MultipleActiveResultSets=true"
+  }
+}
+```
+
+//Add configuration property and build it inside the constructor.
+```
+//Startup.cs
+using Microsoft.Extensions.Configuration;
+
+
+public IConfiguration Configuration { get; set; }
+
+public Startup(IHostingEnvironment env)
+{
+    Configuration = new ConfigurationBuilder()
+        .SetBasePath(env.ContentRootPath)
+        .AddJsonFile("appsettings.json")
+        .Build();
 }
 
 ```
 
+Get rid of the connection string.
 
-Add sorting button
+Old
 ```
-//Index.cshtml
-<input type="button" value="SortTitle" onclick="location.href='@Url.Action("Index", "Home", new {sort =  1})'" />
-<input type="button" value="SortOut" onclick="location.href='@Url.Action("Index", "Home", new {sort =  2})'" />
+//Startup.cs
+var connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=LibraryDB;Trusted_Connection=True;MultipleActiveResultSets=true";
+services.AddDbContext<LibraryContext>
+    (options => options.UseSqlServer(connectionString));
 ```
 
-Modify actions to use the intern
+
+
+New
 ```
-//HomeController.cs
-public IActionResult Index(int sort = 1)
-{
-    switch (sort)
-    {
-        case 2:
-            return View(myintern.OrderByOut.ToList());
-
-        default:
-            return View(myintern.OrderByTitle.ToList());
-
-    }
-}
-
-public IActionResult CheckBook(int id, bool newvalue)
-{
-    return View(myintern.SetOut(id, newvalue));
-}
+services.AddDbContext<LibraryContext>
+    (options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 ```
+
+
 
