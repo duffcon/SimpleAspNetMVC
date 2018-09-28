@@ -1,144 +1,94 @@
 ﻿
-Just using in memory data, will use a database instead using the EntityFramework.
 
+The Good, The Bad, and the Ugly.
+
+The Ugly: Directly instantiate data.
 ```
-Tools > NuGet Package Manager > Package Manager Console
-cd SimpleAspNetMVC
-dotnet add package Microsoft.EntityFrameworkCore.Sqlite
+//HomeController.cs
+public static List<Book> mybooks { get; set; } = new List<Book>{...}
 ```
 
-Create LibraryContext
-```
-//LibraryContext.cs
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace SimpleAspNetMVC.Data.Models
+The Bad (But better): Passing the context as a parameter.
+```
+//HomeController.cs
+public LibraryContext mycontext;
+
+public HomeController(LibraryContext _libraryContext)
 {
-    public class LibraryContext : DbContext
-    {
-        public LibraryContext(DbContextOptions<LibraryContext> options) : base(options)
-        {
-        }
-        public DbSet<Book> BookSet { get; set; }
-
-    }
+    mycontext = _libraryContext;
 }
 ```
 
 
-You connect to the database with a connection string like this.
-```
-"Server=(localdb)\\MSSQLLocalDB;Database=_CHANGE_ME_;Trusted_Connection=True;MultipleActiveResultSets=true"
-```
-
-I will call the database: LibraryDB.
-```
-"Server=(localdb)\\MSSQLLocalDB;Database=LibraryDB;Trusted_Connection=True;MultipleActiveResultSets=true"
-```
-
-"Put" the context into our app
-```
-//Startup.cs
-    var connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=LibraryDB;Trusted_Connection=True;MultipleActiveResultSets=true";
-    services.AddDbContext<LibraryContext>
-        (options => options.UseSqlServer(connectionString));
-```
-
-Add using statements
-```
-//Startup.cs
-using Microsoft.EntityFrameworkCore;
-using SimpleAspNetMVC.Data.Models;
-```
 
 
-Package Manager Console
-```
-add-migration initial
-update-database
-```
+Will interact with DBSet<Book> instead of a List<Book> using LINQ.
 
-Created database, but empty
+Modify the Index action.
 ```
-View > SQL Server Object Explorer
-[Refresh]
-SQL Server > (localdb)\MSSQLocalDB.... > Databases > LibraryDB
-```
-
-
-Need to populate the database. Create DBInit.cs with a Seed function.
-
-```
-//DBInit.cs
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace SimpleAspNetMVC.Data.Models
+//HomeController.cs
+public IActionResult Index()
 {
-    public class DBInit
-    {
-        public static void Seed(IApplicationBuilder applicationBuilder)
-        {
-            LibraryContext context = applicationBuilder.ApplicationServices.GetRequiredService<LibraryContext>();
+    IEnumerable<Book> mybooks = (from b in mycontext.BookSet
+                    orderby b.Title
+                    select b).AsEnumerable();
+    return View(mybooks.ToList());
+}
 
-            //If The database has no books
-            if (!context.BookSet.Any())
-            {
-                context.AddRange
-                (
-                    new Book { Title = "The Great Gatsby", Author = "F. Scott Fitzgerald", Out = true },
-                    new Book { Title = "The Adventures of Tom Sawyer", Author = "Mark Twain", Out = false },
-                    new Book { Title = "Adventures of Huckleberry Finn", Author = "Mark Twain", Out = false },
-                    new Book { Title = "This Side of Paradise", Author = "F Scott Fitzgerald", Out = true }
-                );
-            }
+```
 
-            context.SaveChanges();
 
-        }
-    }
+
+
+
+And the CheckBook action.
+```
+//HomeController.cs
+public IActionResult CheckBook(int id, bool newvalue)
+{
+    Book mybooks = (from b in mycontext.BookSet
+                    where b.ID == id
+                    select b).FirstOrDefault();
+    mybooks.Out = newvalue;
+    mycontext.SaveChanges();
+    return View(mybooks);
 }
 ```
 
-Seed function called at startup.
+
+Optional: Using some more advanced LINQ add sorting feature
 ```
-//Startup.cs
-DBInit.Seed(app);
+//HomeController.cs
+public IActionResult Index(int sort = 1)
+{
+    IEnumerable<Book> mybooks = null;
+    switch (sort)
+    {
+        case 1:
+            mybooks = (from b in mycontext.BookSet
+                            orderby b.Title
+                            select b).AsEnumerable();
+            break;
+        case 2:
+            mybooks = (from b in mycontext.BookSet
+                            orderby b.Out
+                            select b).AsEnumerable();
+            break;
+               
+    }
+    return View(mybooks.ToList());
+}
+
 ```
 
-You will get thrown and error add this code to Program.cs
 
-Old
-```
-//Program.cs
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
-```
 
-New
+
 ```
-//Program.cs
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>()
-                .UseDefaultServiceProvider(options =>
-                        options.ValidateScopes = false);
+//Index.cshtml
+<br /> 
+<input type="button" value="SortTitle" onclick="location.href='@Url.Action("Index", "Home", new {sort =  1})'" />
+<input type="button" value="SortOut" onclick="location.href='@Url.Action("Index", "Home", new {sort =  2})'" />
 ```
 
-Run the program and exit. The database has values.
-```
-SQL Server Object Explorer
-[Refresh]
-SQL Server > (localdb)\MSSQLocalDB.... > Databases > LibraryDB >Tables > dbo.BookSet > [right click] > View Data
-```
-
-The database has been created, but is not being used.

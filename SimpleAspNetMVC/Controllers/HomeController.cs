@@ -9,23 +9,29 @@ namespace SimpleAspNetMVC.Controllers
 {
     public class HomeController : Controller
     {
-        public static List<Book> mybooks { get; set; } = new List<Book>
+        public LibraryContext mycontext;
+
+        public HomeController(LibraryContext context)
         {
-            new Book {ID = 0, Title= "The Great Gatsby", Author = "F. Scott Fitzgerald", Out = true},
-            new Book {ID = 1, Title = "The Adventures of Tom Sawyer", Author = "Mark Twain", Out = false},
-            new Book {ID = 2, Title = "Adventures of Huckleberry Finn", Author = "Mark Twain", Out = false},
-            new Book {ID = 3, Title= "This Side of Paradise", Author = "F. Scott Fitzgerald", Out = true}
-        };
+            mycontext = context;
+        }
 
         public IActionResult Index()
         {
-            return View(mybooks);
+            IEnumerable<Book> mybooks = (from b in mycontext.BookSet
+                                         orderby b.Title
+                                         select b).AsEnumerable();
+            return View(mybooks.ToList());
         }
 
         public IActionResult CheckBook(int id, bool newvalue)
         {
-            mybooks[id].Out = newvalue;
-            return View(mybooks[id]);
+            Book mybooks = (from b in mycontext.BookSet
+                           where b.ID == id
+                           select b).FirstOrDefault();
+            mybooks.Out = newvalue;
+            mycontext.SaveChanges();
+            return View(mybooks);
         }
     }
 }
