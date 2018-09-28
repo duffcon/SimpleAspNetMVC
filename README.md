@@ -1,5 +1,5 @@
 ﻿
-It is bad practice to have the connection string variable. It is better to use appsettings which is more "hidden".
+It is bad practice to have the connection string out in the open. It is better to use appsettings which is more "hidden".
 ```
 //Startup.cs
 var connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=LibraryDB;Trusted_Connection=True;MultipleActiveResultSets=true";
@@ -19,7 +19,7 @@ Add Item > [search appsettings] > App Settings File
 }
 ```
 
-Change the CHANGE_ME
+Changed the CHANGE_ME to LibraryDB.
 ```
 //appsettings.json
 {
@@ -29,7 +29,7 @@ Change the CHANGE_ME
 }
 ```
 
-//Add configuration property and build it inside the constructor.
+Need to tell the app to use appsettings. Create configuration property and build it inside the constructor.
 ```
 //Startup.cs
 using Microsoft.Extensions.Configuration;
