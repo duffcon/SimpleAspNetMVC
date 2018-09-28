@@ -1,11 +1,26 @@
-﻿
-Just using in memory data, will use a database instead using the EntityFramework.
+﻿Currently using "In-Memory" data, will use a database instead.
 
+Normally you interact with a database directly using an SQL query.
+
+![File](file.png)
+
+This project will use the EntityFramework (middle-man) which makes the interaction less tedious.
+
+![File2](file2.png)
+
+You will have a DbContext class containing a DBSet<> for every table in the database. 
+
+![File3](file3.png)
+
+Install EntityFramework
 ```
 Tools > NuGet Package Manager > Package Manager Console
 cd SimpleAspNetMVC
 dotnet add package Microsoft.EntityFrameworkCore.Sqlite
 ```
+
+
+
 
 Create LibraryContext
 ```
@@ -40,29 +55,33 @@ I will call the database: LibraryDB.
 "Server=(localdb)\\MSSQLLocalDB;Database=LibraryDB;Trusted_Connection=True;MultipleActiveResultSets=true"
 ```
 
-"Put" the context into our app
-```
-//Startup.cs
-    var connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=LibraryDB;Trusted_Connection=True;MultipleActiveResultSets=true";
-    services.AddDbContext<LibraryContext>
-        (options => options.UseSqlServer(connectionString));
-```
-
-Add using statements
+Pass the context into our app
 ```
 //Startup.cs
 using Microsoft.EntityFrameworkCore;
 using SimpleAspNetMVC.Data.Models;
+
+var connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=LibraryDB;Trusted_Connection=True;MultipleActiveResultSets=true";
+services.AddDbContext<LibraryContext>
+    (options => options.UseSqlServer(connectionString));
 ```
 
+Right now we have a context object and a connection string pointing to a theoretical database.
 
-Package Manager Console
+![File4](file4.png)
+
+Type the following to let EntityFramework create it for you.
 ```
+[Package Manager Console]
 add-migration initial
 update-database
 ```
 
-Created database, but empty
+An empty database should now exist.
+
+![File5](file5.png)
+
+
 ```
 View > SQL Server Object Explorer
 [Refresh]
@@ -141,4 +160,4 @@ SQL Server Object Explorer
 SQL Server > (localdb)\MSSQLocalDB.... > Databases > LibraryDB >Tables > dbo.BookSet > [right click] > View Data
 ```
 
-The database has been created, but is not being used.
+You now have an idle populated database which will be used in the next branch.
