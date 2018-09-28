@@ -1,9 +1,18 @@
 ﻿@using SimpleAspNetMVC.Data.Models;
 @model List<Book>
 
-<h2 style="color:brown">Library</h2>
+
+<h2>Library</h2>
 
 @foreach (var b in Model)
 {
-    <p> @b.Title - @b.Author Out:@b.Out</p>
+    if (b.Out == true)
+    {
+        <p style="color:Red">@b.Title - @b.Author  <input type="button" value="Check In" onclick="location.href='@Url.Action("CheckBook", "Home", new {id = b.ID, newvalue = !b.Out})'" /> </p>
+    }
+    else
+    {
+        <p style="color:Green">@b.Title - @b.Author <input type="button" value="Check Out" onclick="location.href='@Url.Action("CheckBook", "Home", new {id = b.ID, newvalue = !b.Out})'" /> </p>
+    }
+
 }

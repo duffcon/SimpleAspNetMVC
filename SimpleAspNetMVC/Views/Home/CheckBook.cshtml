@@ -1,0 +1,17 @@
+﻿@using SimpleAspNetMVC.Data.Models;
+@model Book
+
+<h2>Library</h2>
+
+@{
+    if (Model.Out == false)
+    {
+        <h2> You Checked In @Model.Title - @Model.Author</h2>
+    }
+    else
+    {
+        <h2> You Checked Out @Model.Title - @Model.Author</h2>
+    }
+}
+
+<input type="button" value="Go Back" onclick="location.href='@Url.Action("Index", "Home")'" />
