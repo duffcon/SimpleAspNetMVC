@@ -1,5 +1,8 @@
-﻿
-Instantiate some books in the HomeController
+﻿The client will go through the "HomeController" controller and get the "Index" view which contains A list of type "Book".
+
+![File](file.png)
+
+Instantiate some books in the HomeController.
 ```
 //HomeController.cs
 public List<Book> mybooks { get; set; } = new List<Book>
@@ -49,9 +52,3 @@ return View(mybooks[0]);
 }
 ```
 
-
-
-
-
-```
-```
