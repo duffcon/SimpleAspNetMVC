@@ -1,7 +1,6 @@
-﻿
-The Good: passing interface. 
+﻿Upgrade to Good: passing interface. 
 
-The HomeController has a lot on its plate: dealing with actions AND books. Instead we will outsource the book stuff to an intern.
+The HomeController has a lot on its plate: dealing with actions AND books. We will outsource the book stuff to an intern.
 
 Create Data/inerfaces.
 
@@ -92,12 +91,11 @@ namespace SimpleAspNetMVC.Data.Models
 
     }
 }
-
 ```
 
 
 
-Need to inject the intern.
+Inject the intern(let the intern inside the building).
 ```
 //Startup.cs
 using SimpleAspNetMVC.Data.interfaces;
@@ -105,7 +103,7 @@ using SimpleAspNetMVC.Data.interfaces;
 services.AddTransient<ILibraryIntern, LibraryIntern>();
 ```
 
-
+Modify the constructor.
 ```
 //HomeController.cs
 using SimpleAspNetMVC.Data.interfaces;
@@ -127,7 +125,7 @@ Add sorting button
 <input type="button" value="SortOut" onclick="location.href='@Url.Action("Index", "Home", new {sort =  2})'" />
 ```
 
-Modify actions to use the intern
+Modify actions to use the intern (put the intern to work).
 ```
 //HomeController.cs
 public IActionResult Index(int sort = 1)
