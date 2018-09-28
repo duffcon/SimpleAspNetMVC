@@ -40,7 +40,7 @@ I will call the database: LibraryDB.
 "Server=(localdb)\\MSSQLLocalDB;Database=LibraryDB;Trusted_Connection=True;MultipleActiveResultSets=true"
 ```
 
-"Put" the context into our services
+"Put" the context into our app
 ```
 //Startup.cs
     var connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=LibraryDB;Trusted_Connection=True;MultipleActiveResultSets=true";
@@ -58,6 +58,7 @@ using SimpleAspNetMVC.Data.Models;
 
 Package Manager Console
 ```
+add-migration initial
 update-database
 ```
 
@@ -69,7 +70,7 @@ SQL Server > (localdb)\MSSQLocalDB.... > Databases > LibraryDB
 ```
 
 
-Need to populate or initialize the database. Create DBInit.cs. Call the Seed function to populate the database with books.
+Need to populate the database. Create DBInit.cs with a Seed function.
 
 ```
 //DBInit.cs
@@ -107,6 +108,7 @@ namespace SimpleAspNetMVC.Data.Models
 }
 ```
 
+Seed function called at startup.
 ```
 //Startup.cs
 DBInit.Seed(app);
@@ -131,3 +133,12 @@ New
                 .UseDefaultServiceProvider(options =>
                         options.ValidateScopes = false);
 ```
+
+Run the program and exit. The database has values.
+```
+SQL Server Object Explorer
+[Refresh]
+SQL Server > (localdb)\MSSQLocalDB.... > Databases > LibraryDB >Tables > dbo.BookSet > [right click] > View Data
+```
+
+The database has been created, but is not being used.
