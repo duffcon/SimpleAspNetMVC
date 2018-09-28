@@ -1,9 +1,6 @@
 ﻿@using SimpleAspNetMVC.Data.Models;
 @model List<Book>
 
-
-<h2>Library</h2>
-
 <input type="button" value="SortTitle" onclick="location.href='@Url.Action("Index", "Home", new {sort =  1})'" />
 <input type="button" value="SortOut" onclick="location.href='@Url.Action("Index", "Home", new {sort =  2})'" />
 

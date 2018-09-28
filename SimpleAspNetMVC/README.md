@@ -1,69 +1,97 @@
-﻿
-It is bad practice to have the connection string variable. It is better to use appsettings which is more "hidden".
+﻿If we want a navigation bar at the top you will have to add the html to both pages which is redundant
 ```
-//Startup.cs
-var connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=LibraryDB;Trusted_Connection=True;MultipleActiveResultSets=true";
-```
-
-
-```
-Add Item > [search appsettings] > App Settings File
+//Index.cshtml
+<ul>
+    <li><a class="active" href="#home">Home</a></li>
+</ul>
 ```
 
+
 ```
-//appsettings.json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Server=(localdb)\\MSSQLLocalDB;Database=_CHANGE_ME;Trusted_Connection=True;MultipleActiveResultSets=true"
-  }
+//BookClass.cshtml
+<ul>
+    <li><a class="active" href="#home">Home</a></li>
+</ul>
+```
+
+Create Views/Shared
+
+```
+Add Item > Layout > _Layout.cshtml
+```
+
+```
+//_Layout.cshtml
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+</head>
+<body>
+    <style>
+        ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #333;
+        }
+
+        li {
+            float: left;
+        }
+
+            li a {
+                display: block;
+                color: white;
+                text-align: center;
+                padding: 14px 16px;
+                text-decoration: none;
+            }
+    </style>
+    <ul>
+        <li><a class="active" href="#home">Library</a></li>
+    </ul>
+   
+
+    <div>
+        @RenderBody()
+    </div>
+</body>
+</html>
+
+```
+
+Let the app know that the views should be inside of the layout view. However this is just as redundant.
+```
+//Index.cshtml
+@{
+    Layout = "_Layout";
 }
 ```
 
-Change the CHANGE_ME
+
 ```
-//appsettings.json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Server=(localdb)\\MSSQLLocalDB;Database=LibraryDB;Trusted_Connection=True;MultipleActiveResultSets=true"
-  }
+//BookClass.cshtml
+@{
+    Layout = "_Layout";
 }
 ```
 
-//Add configuration property and build it inside the constructor.
+ViewStart is the solution.
 ```
-//Startup.cs
-using Microsoft.Extensions.Configuration;
+Add Item > View Start > _ViewStart.cshtml
+```
 
-
-public IConfiguration Configuration { get; set; }
-
-public Startup(IHostingEnvironment env)
-{
-    Configuration = new ConfigurationBuilder()
-        .SetBasePath(env.ContentRootPath)
-        .AddJsonFile("appsettings.json")
-        .Build();
+```
+_ViewStart.cshtml
+@{
+    Layout = "_Layout";
 }
-
 ```
 
-Get rid of the connection string.
-
-Old
-```
-//Startup.cs
-var connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=LibraryDB;Trusted_Connection=True;MultipleActiveResultSets=true";
-services.AddDbContext<LibraryContext>
-    (options => options.UseSqlServer(connectionString));
-```
-
-
-
-New
-```
-services.AddDbContext<LibraryContext>
-    (options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-```
-
+Now every view you create will be "inside" the layout view.
 
 
