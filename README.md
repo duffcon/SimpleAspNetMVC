@@ -1,4 +1,5 @@
-﻿If we want a navigation bar at the top you will have to add the html to both pages which is redundant
+﻿If you want a navigation bar you will have to redundanly add the HTML to both pages. The process of adding HTML to both pages is really redundant. As a programmer it is your job to reduce redundancy.
+
 ```
 //Index.cshtml
 <ul>
@@ -6,13 +7,16 @@
 </ul>
 ```
 
-
 ```
 //BookClass.cshtml
 <ul>
     <li><a class="active" href="#home">Home</a></li>
 </ul>
 ```
+
+Views will be rendered inside of the _Layout view.
+
+![File](file.png)
 
 Create Views/Shared
 
@@ -64,7 +68,7 @@ Add Item > Layout > _Layout.cshtml
 
 ```
 
-Let the app know that the views should be inside of the layout view. However this is just as redundant.
+Let the app know that this view should be inside of the layout view. However this is just as redundant.
 ```
 //Index.cshtml
 @{
@@ -92,6 +96,6 @@ _ViewStart.cshtml
 }
 ```
 
-Now every view you create will be "inside" the layout view.
+Now every view in the app will be "inside" the layout view.
 
 
