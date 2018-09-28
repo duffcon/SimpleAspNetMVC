@@ -14,6 +14,9 @@ namespace SimpleAspNetMVC.Data.Models
             LibraryContext context = applicationBuilder.ApplicationServices.GetRequiredService<LibraryContext>();
 
             //If The database has no books
+            //If this line gives you an error in Package Manager console
+            //Make sure you are in the project directory: cd SimpleAspNetMVC
+            //Create Database: update-database
             if (!context.BookSet.Any())
             {
                 context.AddRange
