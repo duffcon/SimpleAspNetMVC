@@ -1,7 +1,7 @@
 ﻿## Simple ASP.NET MVC Application
 
 ### What
-ASP.NET application that checks-out books and saves the status to a database. This is intended for beginners who are overwhelmed by the default Visual Studio MVC app.
+Library to view and check-out books. Data stored in a database using the EntityFramework. This is intended for beginners who are overwhelmed by the default Visual Studio MVC app.
 
 Subjects: ASP.NET, MVC, C#, Class, Interface, HTML, CSS, Razor Syntax, Database, EntityFramework, SQLite, LINQ, Dependency Injection. 
 
@@ -9,21 +9,25 @@ I learned a lot from: https://github.com/etrupja/DrinkAndGo
 
 
 
-### Start: 
+### Transformation: 
 
-![File ](file.JPG)
-![File](file2.JPG)
+Application slowly progresses from an HTML page to an interactive website. Steps are separated into branches.
 
-### End:
-![File ](file3.JPG)
-![File](file4.JPG)
-![File](file5.JPG)
+![File ](file.JPG ){width = 45%} ![File ](file3.JPG){width = 45%} 
+
+![File](file2.JPG){width = 45%} ![File](file5.JPG){width = 45%}
+
+
+
+
+
+### Try:
 
 To run the final version:
 
 Clone the Repo
 ```
-git clone
+git clone https://github.com/duffcon/SimpleAspNetMVC.git
 ```
 
 Open Solution in Visual Studio
