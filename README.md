@@ -1,4 +1,5 @@
-﻿Instantiate some books in the HomeController
+﻿
+Instantiate some books in the HomeController
 ```
 //HomeController.cs
 public List<Book> mybooks { get; set; } = new List<Book>
