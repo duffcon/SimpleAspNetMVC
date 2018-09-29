@@ -15,7 +15,7 @@ Application slowly progresses from an HTML page to an interactive website. Steps
 
 <img src='file.JPG' width=45%> <img src='file3.JPG' width=45%>
 
-<img src='file2.JPG' width=45%> <img src='file4.JPG' width=45%>
+<img src='file2.JPG' width=45%> <img src='file5.JPG' width=45%>
 
 
 
