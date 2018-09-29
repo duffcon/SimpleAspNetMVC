@@ -27,7 +27,7 @@ namespace SimpleAspNetMVC.Data.interfaces
 
 
 
-LibraryIntern has passed the interview they need to train for the job (inplement interface). Create LibraryIntern.cs
+LibraryIntern has passed the interview they need to train for the job (implement interface). Create LibraryIntern.cs
 ```
 //LibraryIntern.cs
 using SimpleAspNetMVC.Data.interfaces;
@@ -95,7 +95,7 @@ namespace SimpleAspNetMVC.Data.Models
 
 
 
-Inject the intern(let the intern inside the building).
+Inject the intern (let the intern inside the building).
 ```
 //Startup.cs
 using SimpleAspNetMVC.Data.interfaces;
