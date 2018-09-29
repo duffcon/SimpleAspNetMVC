@@ -1,4 +1,5 @@
 ﻿The server will now use the MVC architecture.
+
 ![File](file.png)
 
 Use MVC instead of static files.
