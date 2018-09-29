@@ -1,4 +1,4 @@
-﻿The client will go through the "HomeController" controller and get the "Index" view which contains A list of type "Book".
+﻿The client will go through the "HomeController" controller and get the "Index" view which contains a list of type "Book".
 
 ![File](file.png)
 
